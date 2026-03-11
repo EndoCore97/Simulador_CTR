@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>Portal de Autenticación Claro Peru</title>
+
+<style>
+body {
+    margin: 0;
+    font-family: "Segoe UI Light", "Segoe UI", Arial, sans-serif;
+    display: flex;
+    height: 100vh;
+}
+
+/* IZQUIERDA */
+.left-panel {
+    width: 65%;
+    position: relative;
+    background-image: url("personas.jpg");
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+}
+
+/* TEXTO */
+.banner-text {
+    position: absolute;
+    bottom: 120px;
+    left: 50%;
+    transform: translateX(-50%);
+    color: white;
+    text-align: center;
+    width: 100%;
+}
+
+.banner-text h3 {
+    border: 3px solid white;
+    border-radius: 25px; /* Added rounded corners */
+    display: inline-block;
+    padding: 8px 20px;
+    font-weight: 700;
+    font-family: "Segoe UI", sans-serif;
+    letter-spacing: 1px;
+    margin-bottom: 5px;
+}
+
+.banner-text h1 {
+    font-size: 80px; /* Made larger to match image */
+    margin: 0;
+    font-weight: 900;
+    font-family: "Impact", "Segoe UI Black", sans-serif; /* Thicker font */
+    letter-spacing: 2px;
+}
+
+/* DERECHA */
+.right-panel {
+    width: 35%;
+    background: #ffffff; /* Changed to white */
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 60px 80px; /* Adjusted padding */
+    box-sizing: border-box;
+    position: relative;
+}
+
+h2 {
+    font-weight: 300; /* Thinner font weight */
+    font-size: 24px;
+    margin-bottom: 40px;
+    margin-top: -100px; /* Shifted up slightly */
+    color: #333;
+}
+
+.form-group {
+    margin-bottom: 15px;
+}
+
+label {
+    font-size: 13px;
+    color: #333;
+    display: block;
+    margin-bottom: 5px;
+}
+
+input {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #b3c6e6; /* Lighter blue border */
+    background-color: #e8f0fe; /* Light blue autofill background */
+    font-size: 14px;
+    box-sizing: border-box;
+    outline: none;
+}
+
+button {
+    background: #0067b8; /* Microsoft specific blue */
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    cursor: pointer;
+    margin-top: 10px;
+    font-size: 15px;
+    align-self: flex-start; /* Aligns button to the left like the image */
+}
+
+button:hover {
+    background: #005fa3;
+}
+
+.footer {
+    position: absolute;
+    bottom: 20px;
+    left: 80px;
+    font-size: 11px;
+    color: #666;
+}
+
+/* PANTALLA DE CARGA */
+#loading-screen {
+    position: fixed;
+    inset: 0;
+    background: #f2f2f2;
+    display: none;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+}
+
+/* Spinner estilo Microsoft */
+.spinner {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    border: 6px solid #ccc;
+    border-top: 6px solid #666;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    100% { transform: rotate(360deg); }
+}
+
+</style>
+</head>
+
+<body>
+
+<div class="left-panel">
+    <div class="banner-text">
+        <h3>TODOS ESTAMOS EN</h3>
+        <h1>#MODOCLARO</h1>
+    </div>
+</div>
+
+<div class="right-panel">
+    <h2>Portal de Autenticación Claro Peru</h2>
+    
+    <div class="form-group">
+        <label>Iniciar sesión</label>
+        <input type="text" id="usuario" placeholder="usuario@claro.com.pe">
+    </div>
+    
+    <div class="form-group">
+        <input type="password" id="password" placeholder="Contraseña">
+    </div>
+    
+    <button onclick="login()">Iniciar sesión</button>
+    
+    <div class="footer">© 2018 Microsoft</div>
+</div>
+
+<script>
+function login() {
+    const usuario = document.getElementById("usuario").value;
+    const password = document.getElementById("password").value;
+
+    if (usuario === "E8713482@claro.com.pe" && password === "Pancitoconpollo123*") {
+
+        document.getElementById("loading-screen").style.display = "flex";
+
+        setTimeout(() => {
+            window.location.href = "claro.html";
+        }, 2000);
+
+    } else {
+        alert("Usuario o contraseña incorrectos");
+    }
+}
+</script>
+
+<div id="loading-screen">
+    <div class="spinner"></div>
+</div>
+
+</body>
+</html>

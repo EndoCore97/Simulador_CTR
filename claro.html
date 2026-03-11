@@ -1,0 +1,475 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CLARO TE RECOMIENDA</title>
+<style>
+    /* ===== RESET BÁSICO ===== */
+    * { margin: 0; padding: 0; box-sizing: border-box; font-family: Arial, Helvetica, sans-serif; }
+    body { background-color: #fcfcfc; }
+
+    /* ===== HEADER ===== */
+    header { background-color: #DA291C; color: white; display: flex; justify-content: space-between; align-items: center; padding: 10px 20px; height: 60px; }
+    .header-left { display: flex; align-items: center; gap: 15px; }
+    .logo-claro { background-color: white; color: #DA291C; border-radius: 50%; width: 35px; height: 35px; display: flex; justify-content: center; align-items: center; font-weight: bold; font-size: 10px; letter-spacing: -0.5px; background-image: radial-gradient(circle at top left, #fff, #ddd); box-shadow: inset -2px -2px 4px rgba(0,0,0,0.2); }
+    .title-container { display: flex; flex-direction: column; }
+    .title-container strong { font-size: 16px; font-weight: bold; text-transform: uppercase; letter-spacing: 0.5px; }
+    .title-container span { font-size: 11px; margin-top: 2px; }
+    .header-right { display: flex; flex-direction: column; align-items: flex-end; font-size: 11px; gap: 5px; }
+    .user-info { display: flex; align-items: center; gap: 5px; }
+    .user-icon { width: 12px; height: 12px; fill: white; }
+    .session-info { display: flex; align-items: center; gap: 10px; }
+    .btn-logout { background-color: #cc2519; color: white; border: 1px solid white; border-radius: 4px; padding: 4px 8px; font-size: 10px; cursor: pointer; display: flex; align-items: center; gap: 4px; }
+    .btn-logout:hover { background-color: rgba(255,255,255,0.2); }
+    .power-icon { width: 10px; height: 10px; fill: white; }
+
+    /* ===== BUSQUEDA ===== */
+    .search-container { background-color: white; padding: 15px 20px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); margin-bottom: 20px; }
+    .search-bar { display: flex; align-items: center; justify-content: center; gap: 15px; font-size: 11px; font-weight: bold; color: #333; }
+    .form-group { display: flex; align-items: center; gap: 5px; }
+    .search-bar select, .search-bar input { border: 1px solid #ccc; padding: 4px 5px; font-size: 11px; outline: none; height: 24px; }
+    .search-bar select { width: 120px; cursor: pointer; }
+    .search-bar input { width: 100px; }
+    .btn-action { background-color: #DA291C; color: white; border: none; border-radius: 3px; padding: 5px 15px; font-size: 11px; font-weight: bold; cursor: pointer; height: 24px; }
+    .btn-action:hover { background-color: #B51F15; }
+
+    /* ===== RESULTADOS ===== */
+    .results-container { display: none; padding: 0 20px 20px 20px; }
+
+    /* DATOS DEL CLIENTE */
+    .client-data-panel { background-color: white; border: 1px solid #ddd; box-shadow: 0 2px 5px rgba(0,0,0,0.1); margin-bottom: 20px; }
+    .client-header { background-color: #888888; color: white; padding: 8px 15px; font-size: 12px; font-weight: bold; display: flex; align-items: center; gap: 8px; }
+    .client-header svg { width: 14px; height: 14px; fill: white; }
+    .client-row { display: flex; border-bottom: 1px solid #eee; padding: 8px 15px; font-size: 11px; }
+    .client-row:last-child { border-bottom: none; }
+    .client-label { width: 150px; color: #555; }
+    .client-value { color: #333; }
+
+    /* PANELES DE TABLAS */
+    .tables-split { display: flex; gap: 20px; align-items: flex-start; }
+    .left-panel { flex: 1.2; background: white; box-shadow: 0 2px 5px rgba(0,0,0,0.1); display: flex; flex-direction: column; }
+    .right-panel { flex: 1.5; background: white; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+
+    /* ESTILOS DE TABLAS */
+    table { width: 100%; border-collapse: collapse; font-size: 10.5px; }
+    th, td { border: 1px solid #e0e0e0; padding: 8px 10px; text-align: left; vertical-align: top; }
+
+    /* Tabla Izquierda */
+    .table-left th { background-color: #000; color: white; font-weight: bold; }
+    .table-left tbody tr { transition: background-color 0.2s; cursor: pointer; } 
+    .table-left tbody tr:hover { background-color: #f5f5f5; }
+    .table-left tr.active { background-color: #cce5ff; } 
+
+    .status-dot { display: inline-block; width: 11px; height: 11px; border-radius: 50%; margin-right: 5px; border: 1px solid rgba(0,0,0,0.3); vertical-align: middle; }
+    .dot-red { background-color: #dc3545; }
+    .dot-green { background-color: #28a745; }
+    .dot-yellow { background-color: #ffc107; }
+
+    .pagination-bar { display: flex; justify-content: space-between; align-items: center; padding: 10px; font-size: 10px; color: #555; border-top: 1px solid #e0e0e0; }
+    .pagination-controls { display: flex; gap: 5px; }
+    .page-btn { border: 1px solid #ccc; background: white; padding: 4px 8px; cursor: pointer; color: #333; text-decoration: none; border-radius: 2px;}
+    .page-btn.active { background-color: #0d6efd; color: white; border-color: #0d6efd; }
+    .page-btn:hover:not(.active) { background-color: #f0f0f0; }
+
+    /* Tabla Derecha (Detalles) */
+    .table-right th { font-size: 14px; font-weight: bold; }
+    .table-right th:first-child { width: 30%; font-size: 11px; text-transform: uppercase; }
+    .table-right td:first-child { color: #555; }
+    .table-right ul { padding-left: 20px; margin: 5px 0; }
+    .table-right li { margin-bottom: 4px; }
+    .table-right a { color: #0d6efd; text-decoration: none; }
+    .table-right a:hover { text-decoration: underline; }
+
+</style>
+</head>
+<body>
+
+    <header>
+        <div class="header-left">
+            <div class="logo-claro">Claro-</div>
+            <div class="title-container">
+                <strong>CLARO TE RECOMIENDA</strong>
+                <span>Búsqueda de promociones</span>
+            </div>
+        </div>
+        <div class="header-right">
+            <div class="user-info">
+                <svg class="user-icon" viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+                E8713482 - HECTOR PACHERRE TORRES
+            </div>
+            <div class="session-info">
+                <span id="session-text">Session ID : Cargando...</span>
+                <button class="btn-logout" onclick="window.location.href='index.html'">
+                    <svg class="power-icon" viewBox="0 0 24 24"><path d="M13 3h-2v10h2V3zm4.83 2.17l-1.42 1.42C17.99 7.86 19 9.81 19 12c0 3.87-3.13 7-7 7s-7-3.13-7-7c0-2.19 1.01-4.14 2.58-5.42L6.17 5.17C4.23 6.82 3 9.26 3 12c0 4.97 4.03 9 9 9s9-4.03 9-9c0-2.74-1.23-5.18-3.17-6.83z"/></svg>
+                    Cerrar sesión
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <div class="search-container">
+        <div class="search-bar">
+            <div class="form-group">
+                <label>Tipo de Documento:</label>
+                <select id="inputTipoDoc">
+                    <option value="" selected>Seleccionar</option>
+                    <option value="DNI">DNI</option>
+                    <option value="CE">CE</option>
+                    <option value="CIP">CIP</option>
+                    <option value="RUC">RUC</option>
+                    <option value="PASAPORTE">PASAPORTE</option>
+                    <option value="CIRE">CIRE</option>
+                    <option value="CIE">CIE</option>
+                    <option value="CPP">CPP</option>
+                    <option value="CTM">CTM</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>N° Documento:</label>
+                <input type="text" id="inputNroDoc">
+            </div>
+            <div class="form-group">
+                <label>Línea:</label>
+                <input type="text" id="inputLinea">
+            </div>
+            <div class="form-group">
+                <label>Cuenta:</label>
+                <input type="text" id="inputCuenta">
+            </div>
+            <div class="form-group">
+                <label>Contrato:</label>
+                <input type="text" id="inputContrato">
+            </div>
+            <button class="btn-action" id="btnBuscar">Buscar</button>
+            <button class="btn-action" id="btnLimpiar">Limpiar</button>
+        </div>
+    </div>
+
+    <div class="results-container" id="panelResultados">
+        
+        <div class="client-data-panel">
+            <div class="client-header">
+                <svg viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+                Datos del cliente
+            </div>
+            <div class="client-body">
+                <div class="client-row"><div class="client-label">Cliente:</div><div class="client-value" id="clienteNombre">...</div></div>
+                <div class="client-row"><div class="client-label">Nro Documento:</div><div class="client-value" id="clienteDoc">...</div></div>
+            </div>
+        </div>
+
+        <div class="tables-split">
+            
+            <div class="left-panel">
+                <table class="table-left" id="tablaIzquierda">
+                    <thead>
+                        <tr>
+                            <th>LINEA +</th>
+                            <th>CUENTA +</th>
+                            <th>CONTRATO +</th>
+                            <th>RECOMENDACIÓN +</th>
+                        </tr>
+                    </thead>
+                    <tbody id="cuerpoTablaIzquierda">
+                        </tbody>
+                </table>
+                <div class="pagination-bar">
+                    <span id="textoPaginacion">Mostrando 1 a X de X elementos</span>
+                    <div class="pagination-controls">
+                        <a class="page-btn">Anterior</a>
+                        <a class="page-btn active">1</a>
+                        <a class="page-btn">2</a>
+                        <a class="page-btn">Siguiente</a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="right-panel">
+                <table class="table-right" id="tablaDerecha">
+                    </table>
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+        // Reloj
+        function updateDateTime() {
+            const now = new Date();
+            const day = String(now.getDate()).padStart(2, '0');
+            const month = String(now.getMonth() + 1).padStart(2, '0');
+            const year = now.getFullYear();
+            let hours = now.getHours();
+            const minutes = String(now.getMinutes()).padStart(2, '0');
+            const seconds = String(now.getSeconds()).padStart(2, '0');
+            const ampm = hours >= 12 ? 'PM' : 'AM';
+            document.getElementById('session-text').innerText = `Session ID : 20260310194150292 ${day}/${month}/${year}, ${String(hours).padStart(2, '0')}:${minutes}:${seconds} ${ampm}`;
+        }
+        updateDateTime(); setInterval(updateDateTime, 1000);
+
+        // ==========================================
+        // BASE DE DATOS DE CLIENTES Y FILAS
+        // ==========================================
+        
+        // --- Cliente 1: Hector (966310655) ---
+        const dataHector = {
+            nombre: "Hector Adrian Pacherre Torres",
+            doc: "74174478",
+            filas: [
+                { linea: "966310655", cuenta: "47165793", contrato: "31762080", campana: "hector_inbound", texto: "<span class='status-dot dot-red'></span>Ofrecimiento Escalonado - Inbound" },
+                { linea: "966310655", cuenta: "47165793", contrato: "31762080", campana: "hector_upgrade", texto: "<span class='status-dot dot-green'></span>Upgrade de plan Postpago" },
+                { linea: "966310655", cuenta: "47165793", contrato: "31762080", campana: "hector_linea_adicional", texto: "<span class='status-dot dot-green'></span>Línea móvil adicional" },
+                { linea: "966310655", cuenta: "47165793", contrato: "31762080", campana: "null", texto: "<span class='status-dot dot-green'></span>Ofrece el antivirus Norton Security" },
+                { linea: "966310655", cuenta: "", contrato: "", campana: "hector_claroclub", texto: "<span class='status-dot dot-yellow'></span>Cuéntale sobre el Programa de beneficios Claro club" },
+                { linea: "966310655", cuenta: "47165793", contrato: "31762080", campana: "hector_fullclaro", texto: "<span class='status-dot dot-yellow'></span>Recuérdale a tu cliente que es Full Claro" },
+                { linea: "", cuenta: "51156324", contrato: "36728317", campana: "null", texto: "<span class='status-dot dot-green'></span>Repetidores WiFi 360°" },
+                { linea: "", cuenta: "51156324", contrato: "36728317", campana: "null", texto: "<span class='status-dot dot-green'></span>Upgrade de velocidad Fija" }
+            ]
+        };
+
+        // --- Cliente 2: Carla (925485908) ---
+        const dataCarla = {
+            nombre: "Carla Gianelly Prada Medrano",
+            doc: "74957842",
+            filas: [
+                { linea: "925485908", cuenta: "107136499", contrato: "99313196", campana: "carla_inbound", texto: "<span class='status-dot dot-red'></span>Ofrecimiento Escalonado - Inbound" },
+                { linea: "925485908", cuenta: "107136499", contrato: "99313196", campana: "carla_fullclaro", texto: "<span class='status-dot dot-green'></span>¡Convierte a tu cliente a FULL CLARO! 📢" },
+                { linea: "925485908", cuenta: "107136499", contrato: "99313196", campana: "carla_renovacion", texto: "<span class='status-dot dot-green'></span>Renovación postpago" },
+                { linea: "925485908", cuenta: "107136499", contrato: "99313196", campana: "carla_linea_adicional", texto: "<span class='status-dot dot-green'></span>Línea móvil adicional" },
+                { linea: "925485908", cuenta: "", contrato: "", campana: "carla_claroclub", texto: "<span class='status-dot dot-yellow'></span>Cuéntale sobre el Programa de beneficios Claro club" },
+                { linea: "925485908", cuenta: "", contrato: "", campana: "null", texto: "<span class='status-dot dot-green'></span>¿Qué accesorios puedo ofrecer?" }
+            ]
+        };
+
+        // ==========================================
+        // BASE DE DATOS DE CAMPAÑAS (PANEL DERECHO)
+        // ==========================================
+        const dbCampanas = {
+            // ---- CAMPAÑAS HECTOR ----
+            "hector_inbound": { 
+                titulo: "<span class='status-dot dot-red' style='width:16px;height:16px;border:2px solid white;vertical-align:text-bottom;'></span> Ofrecimiento Escalonado - Inbound", 
+                categoria: "Ofrecimiento Escalonado", tema: "red", 
+                detalles: [
+                    { label: "¡CLIENTE ES FULL CLARO!", value: "¡TU CLIENTE ES FULL CLARO! Recuérdale que ya recibe:<br>& 🚀 hasta el doble de velocidad en casa<br>& 📱 descuentos exclusivos en celulares<br>& 🌐 más gigas en su celular y otros beneficios <b>GRATIS!!!</b><br><b>Si cancela su plan, perderá estos beneficios</b>" },
+                    { label: "1ra Oferta - Bitel", value: "Ofrece Plan 39.90 con bono 55GB por 6M" },
+                    { label: "1ra Oferta - Entel", value: "Ofrece Plan 39.90 con bono 50GB por 12M" },
+                    { label: "1ra Oferta - Movistar", value: "Ofrece Plan 39.90 con bono 95GB por 36M" },
+                    { label: "1ra Oferta - Baja Voluntaria - Migración a Prepago", value: "Ofrece Plan 39.90 con bono 95GB por 36M" },
+                    { label: "2da Oferta - Renovación", value: "Ofrecer NUEVO EQUIPO CELULAR según indique el módulo \"Renovación postpago\"." }
+                ]
+            },
+            "hector_upgrade": { 
+                titulo: "<span class='status-dot dot-green' style='width:16px;height:16px;border:2px solid white;vertical-align:text-bottom;'></span> Upgrade de plan Postpago", 
+                categoria: "Campaña Postpago", tema: "green", 
+                detalles: [
+                    { label: "Sobre tu cliente", value: "Al 09/03 tu cliente tiene el plan Max 39.90 con 30 GB de Internet.📌" },
+                    { label: "¡Ofrece el upgrade!🔔", value: "<div style='text-align:center'>Ofrécele a tu cliente un plan con <b>más beneficios</b> 👇<br><br><div style='background: linear-gradient(135deg, #a00, #d00); color: white; width: 220px; padding: 15px; border-radius: 8px; margin: 0 auto; box-shadow: 0 4px 8px rgba(0,0,0,0.2);'><h3 style='margin: 0; font-size: 20px; font-weight: normal;'>Plan<br>Max <span style='font-size: 32px; font-weight: 900;'>56.90</span></h3><div style='background: white; color: #d00; margin: 10px 0; padding: 5px; font-size: 22px; font-weight: bold; border-radius: 4px;'>60 GB <span style='font-size: 14px; font-weight: normal; color: #333;'>de internet</span></div><small>📱💬🌐 Redes sociales ilimitadas</small></div></div>" },
+                    { label: "Alternativa con DESCUENTO", value: "<div style='text-align:center'>Ofrécele a tu cliente está <b>promoción por tiempo limitado</b> 👇<br><br><div style='background: linear-gradient(135deg, #a00, #d00); color: white; width: 220px; padding: 15px; border-radius: 8px; margin: 0 auto; box-shadow: 0 4px 8px rgba(0,0,0,0.2);'><div style='font-size:12px; font-weight:bold; margin-bottom:5px; text-transform:uppercase;'>PLAN MAX<br>ILIMITADO <span style='font-size:16px;'>69.90</span></div><div style='background: white; color: #d00; margin: 5px 0; padding: 10px 5px; border-radius: 8px;'><span style='font-size: 36px; font-weight: 900; line-height: 1;'>30</span><div style='display:inline-block; text-align:left; line-height:1.1; vertical-align:top; margin-left:2px;'><span style='font-size:14px; font-weight:bold;'>% DTO</span><br><span style='font-size:12px;'>x 6 meses</span></div></div><div style='background: #ffc107; color: #000; font-weight: bold; padding: 3px 8px; border-radius: 4px; display:inline-block; margin-top:-15px; position:relative; z-index:2; font-size:14px;'>S/ 48.93</div><div style='margin-top: 10px; font-size:12px; font-weight:bold; color:white;'>INTERNET ILIMITADO + 110 GB</div></div></div>" },
+                    { label: "Si cliente acepta el DESCUENTO, se debe tipificar en SIAC", value: "👉 Interacción: Variación<br>👉 Clase: Variación - Servicios<br>👉 Sub Clase: Bono Descuento por upgrade<br><br><b>Nota en interacción (SIAC):</b> Se aplica descuento promocional de 30% por Upgrade por 6 meses." },
+                    { label: "Argumentos de valor", value: "👉 Disfrutará de de navegar en sus redes sociales favoritas de manera ilimitada<br>👉 Disfrutará dede un plan con más GB pagando menos<br>👉 Usa tus datos y evita saturar tu red WiFi." },
+                    { label: "Nota", value: "Validar que la linea NO ESTE BLOQUEADA / no debe estar en suspensión de apoyo / tenga Limite de Crédito MAYOR A CERO" }
+                ]
+            },
+            "hector_linea_adicional": { 
+                titulo: "<span class='status-dot dot-green' style='width:16px;height:16px;border:2px solid white;vertical-align:text-bottom;'></span> Línea móvil adicional", 
+                categoria: "CAMPAÑA :", tema: "green", 
+                detalles: [
+                    { label: "Ofrece una nueva línea en alta o portabilidad", value: "Con el plan Max 39.90" },
+                    { label: "¿Qué incluye el plan Max 39.90?", value: "¡25 GIGAS de Internet! + 5GB en ¡Facebook e Instagram Full! hasta el 30 de junio 2025. Este plan cuenta con llamadas y SMS ilimitados. Revisa la hoja de venta." },
+                    { label: "Bono de Portabilidad", value: "¡Si trae una línea desde otro operador tendrá un bono de 30GB x 6 meses!" },
+                    { label: "¡Tu cliente es full claro!", value: "Dile que por ser Full Claro ¡los 25 GIGAS de su nueva línea subirán a 37.5 GIGAS en alta velocidad!" },
+                    { label: "Cliente sin clave única", value: "Dile a tu cliente que por su seguridad, el titular de la línea móvil debe crear la contraseña única ingresando con su DNI a Mi Claro App. Con esto, podrá aprobar cambios de plan, portabilidad y más." }
+                ]
+            },
+            "hector_claroclub": { 
+                titulo: "<span class='status-dot dot-yellow' style='width:16px;height:16px;border:2px solid white;vertical-align:text-bottom;'></span> Cuéntale sobre el Programa de beneficios Claro club", 
+                categoria: "Campaña<br>Claro club", tema: "yellow", 
+                detalles: [
+                    { label: "Ofrece beneficios de la App Claro club", value: "¡Tu cliente tiene la app Claro club! 📲. Recuérdale que puede acceder a descuentos en comida rápida 🍔, viajes ✈️, diversión 🎭 y mucho más. ¡Tendrá beneficios todos los dias! 🎁" }
+                ]
+            },
+            "hector_fullclaro": { 
+                titulo: "<span class='status-dot dot-yellow' style='width:16px;height:16px;border:2px solid white;vertical-align:text-bottom;'></span> Recuérdale a tu cliente que es Full Claro", 
+                categoria: "Campaña Full Claro", tema: "yellow", 
+                detalles: [
+                    { label: "Beneficios Full Claro", value: "<div style='background-color: #b5121b; padding: 25px 20px; border-radius: 12px; text-align: center; color: white; width: 320px; margin: 0 auto; font-family: Arial, sans-serif; box-shadow: 0 4px 10px rgba(0,0,0,0.15);'><div style='font-size: 20px; margin-bottom: 8px;'>Full beneficios</div><div style='display: inline-block; background-color: white; color: #b5121b; font-size: 26px; font-weight: 900; padding: 2px 12px; border-radius: 6px; margin-bottom: 25px;'>Full Claro</div><div style='display: grid; grid-template-columns: 1fr 1fr; gap: 12px;'><div style='background-color: white; border-radius: 8px; padding: 12px; position: relative; text-align: left; height: 90px; box-sizing: border-box; box-shadow: inset 0 -2px 5px rgba(0,0,0,0.05);'><div style='color: #b5121b; font-weight: bold; font-size: 11px; margin-bottom: 5px;'>Full Velocidad</div><div style='color: #444; font-size: 9px; line-height: 1.2;'>Hasta el doble<br>de velocidad de<br>internet en tu casa.</div><div style='position: absolute; bottom: 8px; right: 8px; background: black; color: white; width: 22px; height: 22px; border-radius: 50%; font-size: 11px; display: flex; align-items: center; justify-content: center;'>📡</div></div><div style='background-color: white; border-radius: 8px; padding: 12px; position: relative; text-align: left; height: 90px; box-sizing: border-box; box-shadow: inset 0 -2px 5px rgba(0,0,0,0.05);'><div style='color: #b5121b; font-weight: bold; font-size: 11px; margin-bottom: 5px;'>Full Descuentos</div><div style='color: #444; font-size: 9px; line-height: 1.2;'>Descuentos<br>exclusivos en<br>equipos postpago.</div><div style='position: absolute; bottom: 8px; right: 8px; background: black; color: white; width: 22px; height: 22px; border-radius: 50%; font-size: 11px; display: flex; align-items: center; justify-content: center;'>%</div></div><div style='background-color: white; border-radius: 8px; padding: 12px; position: relative; text-align: left; height: 90px; box-sizing: border-box; box-shadow: inset 0 -2px 5px rgba(0,0,0,0.05);'><div style='color: #b5121b; font-weight: bold; font-size: 11px; margin-bottom: 5px;'>Full Gigas</div><div style='color: #444; font-size: 9px; line-height: 1.2;'>Más gigas hasta<br>en 5 celulares.</div><div style='position: absolute; bottom: 8px; right: 8px; background: black; color: white; width: 22px; height: 22px; border-radius: 50%; font-size: 11px; display: flex; align-items: center; justify-content: center;'>📱</div></div><div style='background-color: white; border-radius: 8px; padding: 12px; position: relative; text-align: left; height: 90px; box-sizing: border-box; box-shadow: inset 0 -2px 5px rgba(0,0,0,0.05);'><div style='color: #b5121b; font-weight: bold; font-size: 11px; margin-bottom: 5px;'>Full Música</div><div style='color: #444; font-size: 9px; line-height: 1.2;'>Claro música<br>Premium GRATIS.</div><div style='position: absolute; bottom: 8px; right: 8px; background: black; color: white; width: 22px; height: 22px; border-radius: 50%; font-size: 11px; display: flex; align-items: center; justify-content: center;'>🎧</div></div></div></div>" },
+                    { label: "Beneficios", value: "FULL VELOCIDAD: hasta el doble de velocidad en casa<br>FULL DESCUENTOS: en todos los equipos<br>FULL GIGAS: Más gigas hasta en 5 líneas del mismo titular<br>FULL MUSICA: Claro Música Premium gratis, ¡Ahorras S/18.90!" },
+                    { label: "Full Descuentos en equipos al ser Full Claro", value: "En portabilidad, renovación y alta nueva." }
+                ]
+            },
+
+            // ---- CAMPAÑAS CARLA ----
+            "carla_inbound": { 
+                titulo: "<span class='status-dot dot-red' style='width:16px;height:16px;border:2px solid white;vertical-align:text-bottom;'></span> Ofrecimiento Escalonado - Inbound", 
+                categoria: "Ofrecimiento Escalonado", tema: "red", 
+                detalles: [
+                    { label: "1ra Oferta - Entel", value: "Ofrece Plan 69.90 con bono 110GB por 12M" },
+                    { label: "1ra Oferta - Baja Voluntaria - Migración a Prepago", value: "Ofrece Plan 69.90 con bono 110GB por 12M" },
+                    { label: "2da Oferta - Renovación", value: "Ofrecer NUEVO EQUIPO CELULAR según indique el módulo \"Renovación postpago\"." },
+                    { label: "3ra Oferta - Full Claro", value: "Importante: Valida cobertura antes de ofrecer. <b>¡OFRÉCELE SER FULL CLARO!</b> Conviértete en Full Claro sumando tu servicio hogar y disfruta más beneficios, más ahorro y la mejor experiencia. 400Mbps para toda la vida con Full Claro x S/69 mensual (S/55 x6M en HFC). 1Play 200Mbps (S/69). Más velocidad: 400Mbps, Full descuentos en equipos, Más gigas hasta en 5 líneas y Claro música Premium gratis" },
+                    { label: "¡SONDEA OFERTA COMPETENCIA!", value: "🚨 ¡ATENCIÓN! PASO OBLIGATORIO PREVIO AL 4TO OFRECIMIENTO 🚨 ANTES DE DAR CUALQUIER DESCUENTO POR CONTENCIÓN DE PORT OUT 👉 ¡DEBES SONDEAR LA OFERTA DE LA COMPETENCIA E IGUALARLA!" },
+                    { label: "4to Oferta - Bitel", value: "Ofrece Plan 79.90 con 30% por hasta 3M | Plan 69.90 con 30% por hasta 3M" },
+                    { label: "4to Oferta - Entel", value: "Ofrece Plan 79.90 con 30% por hasta 3M | Plan 69.90 con 30% por hasta 3M + bono 110GB por 12M | Plan 60.90 con 30% por hasta 3M + bono 75GB por 12M" },
+                    { label: "4to Oferta - Movistar", value: "Ofrece Plan 79.90 con 30% por hasta 3M | Plan 69.90 con 30% por hasta 3M | Plan 79.90 con S/60 dcto por solo 12M (exclusivo contención oferta línea adicional)" },
+                    { label: "4ta Oferta - Baja Voluntaria - Migración a Prepago", value: "Baja voluntaria: Ofrece de manera escalonada: 30% por 1M (afecto a IMR - VALIDAR!), 30% por 3M (afecto a IMR - VALIDAR!) o 30% por 6M (No afecto a IMR)| Migración a Prepago: Ofrece de manera escalonada: 30% por 1M (afecto a IMR - VALIDAR!) o 30% por 3M (afecto a IMR - VALIDAR!)" }
+                ]
+            },
+            "carla_fullclaro": { 
+                titulo: "¡Convierte a tu cliente a FULL CLARO! 📢", categoria: "Campaña Full Claro", tema: "green", 
+                detalles: [
+                    { label: "Ofrecimiento", value: "¡Ya eres móvil con nosotros! Conviértete en Full Claro sumando tu servicio hogar y disfruta más beneficios, más ahorro y una mejor experiencia en todo." },
+                    { label: "Plan Recomendado", value: "1000Mbps para toda la vida con Full Claro!<br>s/ 1 por 2 meses 👉 1 Play 400 Mbps (S/.89)" },
+                    { label: "Campaña SISACT", value: "HFC/FTTH-PROMO 1 SOL" },
+                    { label: "Beneficios Plan", value: "🛠️ Instalación gratis (sujeto a evaluación)<br>📺 +30 canales en vivo y Universal + a través de Claro video" },
+                    { label: "Beneficios Full Claro", value: "🚀 Más velocidad: hasta 1000Mbps para toda la vida<br>📱 Full descuentos en equipos<br>🌐 Más gigas hasta en 5 líneas<br>🎧 Claro música Premium gratis" }
+                ]
+            },
+            "carla_renovacion": { 
+                titulo: "<span class='status-dot dot-green' style='width:16px;height:16px;border:2px solid white;vertical-align:text-bottom;'></span> Renovación postpago", 
+                categoria: "(actualizado al<br>09/03/26)", tema: "green", 
+                detalles: [
+                    { label: "YA PUEDE RENOVAR", value: "Aplica a Renovación Exclusiva AL CONTADO: Ofrécele un equipo 5G + upgrade de plan" },
+                    { label: "Tu cliente usa un IPHONE", value: "Actualmente tiene: APPLE IPH 16 PRO MAX (GAMA ALTA)" },
+                    { label: "Ofrécele mejorar su iPhone<br>(Revisar stock y lista de precios sugerida)", value: "Opción 1: APPLE IPH 17 PRO MAX 256GB / Opción 2: IPHONE 13 128GB" },
+                    { label: "MEJOR LISTA", value: "Utilizar campaña 1818 - Renovación Exclusiva" },
+                    { label: "Cliente con TARJETA DE CREDITO", value: "Infórmale a tu cliente que puede renovar con su tarjeta de crédito y podrá acceder a cuotas sin intereses. Revisar HV de Bancos en SUIC" },
+                    { label: "Plan actual: MAX ILIM 69.90", value: "Ofrécele renovar en el PLAN MAX ILIMITADO 79.90 obtendrá un mayor descuento en su equipo y mejores beneficios" },
+                    { label: "ClaroPuntos al 09/03/26<br>(Referencial)", value: "299 ClaroPuntos acumulados = S/14.17. Por ser SOCIO LATAM puede intercambiar sus Millas para un DESCUENTO adicional. Marcar *2525# desde su celular" },
+                    { label: "LÁMINA PROTECTORA", value: "Protege la pantalla de tu celular con una lámina de hidrogel. Disponible en versión transparente y antiespía." },
+                    { label: "ACCESORIO NECESARIO", value: "Complementa tu equipo APPLE con Adaptador de corriente Apple USB - C de 20W" },
+                    { label: "SANTIAGO DE SURCO / LIMA / LIMA", value: "ZONA DELIVERY" },
+                    { label: "Alta probabilidad de contratar Protección Móvil", value: "¡Protege tu inversión ante robos! 🚨 Asegura tu nuevo celular desde solo S/0.60 al día contratando Protección Móvil. ¿Activamos el seguro?<br><br><div style='border-radius:8px; overflow:hidden; border:1px solid #ccc; max-width: 350px;'><div style='background:#f4f4f4; padding:20px; text-align:center;'><span style='background:#fff; color:#d00; padding:4px 8px; font-weight:bold; font-size:12px; border-radius:4px; border:1px solid #d00;'>Asegura el nuevo celu de tu cliente</span><h4 style='color:#d00; margin:5px 0 0 0; font-size:16px; font-weight:900;'>CON PROTECCIÓN MÓVIL</h4><div style='margin-top:15px; font-size:40px;'>👩🏽‍🦱📱</div></div><div style='background:#d31245; color:white; padding:10px; display:flex; justify-content:space-around; align-items:flex-start; font-size:9px; text-align:center;'><div style='width:30%;'>📱<br>Estará protegido ante:</div><div style='width:20%;'>⚡<br>DAÑOS<br>FÍSICOS</div><div style='width:20%;'>🦹‍♂️<br>ROBO O<br>HURTO</div><div style='width:30%;'>⚙️<br>FALLAS MECÁNICAS<br>O ELÉCTRICAS</div></div></div>" },
+                    { label: "CLIENTES SIN CLAVE ÚNICA", value: "Cliente sin clave única: Infórmale que, por su seguridad, el titular de la línea debe crear su contraseña única en Mi Claro App con su DNI para aprobar cambios de chip, portabilidad y más operaciones" }
+                ]
+            },
+            "carla_linea_adicional": { 
+                titulo: "<span class='status-dot dot-green' style='width:16px;height:16px;border:2px solid white;vertical-align:text-bottom;'></span> Línea móvil adicional", 
+                categoria: "CAMPAÑA :", tema: "green", 
+                detalles: [
+                    { label: "Ofrece una nueva línea en alta o portabilidad", value: "Con el plan Max Ilimitado 69.90" },
+                    { label: "Súper PROMOCIÓN para su nueva línea (50% en el cargo fijo)", value: "¡Pagará S/34.95 por doce meses!" },
+                    { label: "¿Qué incluye el plan Max Ilimitado 69.90?", value: "¡Internet Ilimitado con 110 GIGAS en alta velocidad! + ¡Llamadas y SMS nacionales ilimitados. Revisa la hoja de venta." },
+                    { label: "Cliente sin clave única", value: "Dile a tu cliente que por su seguridad, el titular de la línea móvil debe crear la contraseña única ingresando con su DNI a Mi Claro App. Con esto, podrá aprobar cambios de plan, portabilidad y más." }
+                ]
+            },
+            "carla_claroclub": { 
+                titulo: "<span class='status-dot dot-yellow' style='width:16px;height:16px;border:2px solid white;vertical-align:text-bottom;'></span> Cuéntale sobre el Programa de beneficios Claro club", 
+                categoria: "Campaña<br>Claro club", tema: "yellow", 
+                detalles: [
+                    { label: "Descarga de la App Claro club", value: "Tu cliente puede hacerla linda ahorrando con Claro club! 🖤🍕 Cuéntale que puede llevarse 8 donuts clásicas por solo S/29.90 en Dunkin descargando la app Claro club 📱." }
+                ]
+            }
+        };
+
+        // ==========================================
+        // FUNCIONES DE RENDERIZADO
+        // ==========================================
+
+        function cargarDatosCliente(datosCliente) {
+            document.getElementById('clienteNombre').innerText = datosCliente.nombre;
+            document.getElementById('clienteDoc').innerText = datosCliente.doc;
+
+            const tbody = document.getElementById('cuerpoTablaIzquierda');
+            tbody.innerHTML = ''; 
+
+            datosCliente.filas.forEach((fila) => {
+                const tr = document.createElement('tr');
+                if(fila.campana !== "null") {
+                    tr.setAttribute('data-campaign', fila.campana);
+                }
+                tr.innerHTML = `
+                    <td>${fila.linea}</td>
+                    <td>${fila.cuenta}</td>
+                    <td>${fila.contrato}</td>
+                    <td>${fila.texto}</td>
+                `;
+                tbody.appendChild(tr);
+            });
+
+            // Actualizar el texto de paginación automáticamente
+            document.getElementById('textoPaginacion').innerText = `Mostrando 1 a ${datosCliente.filas.length} de ${datosCliente.filas.length} elementos`;
+
+            activarClicsFilas();
+
+            // Clickea la primera fila automáticamente al buscar
+            const primeraFilaValida = document.querySelector('#tablaIzquierda tbody tr[data-campaign]');
+            if(primeraFilaValida) {
+                primeraFilaValida.click();
+            }
+        }
+
+        function renderTablaDerecha(idCampana) {
+            const tabla = document.getElementById('tablaDerecha');
+            const data = dbCampanas[idCampana];
+            if(!data) {
+                tabla.innerHTML = "";
+                return;
+            }
+
+            let bgColor = "#D31245"; let textColor = "#ffffff";
+            if (data.tema === "green") { bgColor = "#28a745"; }
+            if (data.tema === "yellow") { bgColor = "#ffc107"; textColor = "#000000"; }
+
+            let html = `<thead><tr>
+                <th style="background-color: ${bgColor}; color: ${textColor};">${data.categoria}</th>
+                <th style="background-color: ${bgColor}; color: ${textColor}; font-weight:normal; font-size:16px;">
+                    <strong style="font-weight:bold">${data.titulo}</strong>
+                </th>
+            </tr></thead><tbody>`;
+            
+            data.detalles.forEach(item => {
+                html += `<tr><td>${item.label}</td><td>${item.value}</td></tr>`;
+            });
+            html += `</tbody>`;
+            tabla.innerHTML = html;
+        }
+
+        function activarClicsFilas() {
+            const filas = document.querySelectorAll('#tablaIzquierda tbody tr');
+            filas.forEach(fila => {
+                fila.addEventListener('click', function() {
+                    const idCampana = this.getAttribute('data-campaign');
+                    if(idCampana && idCampana !== "null") {
+                        filas.forEach(f => f.classList.remove('active'));
+                        this.classList.add('active');
+                        renderTablaDerecha(idCampana);
+                    }
+                });
+            });
+        }
+
+        // ==========================================
+        // BOTONES DE ACCIÓN
+        // ==========================================
+
+        document.getElementById('btnBuscar').addEventListener('click', function() {
+            const inputLinea = document.getElementById('inputLinea').value.trim();
+            const panel = document.getElementById('panelResultados');
+
+            if (inputLinea === '966310655') {
+                panel.style.display = 'block';
+                cargarDatosCliente(dataHector);
+            } 
+            else if (inputLinea === '925485908' || inputLinea === '92548590') {
+                panel.style.display = 'block';
+                cargarDatosCliente(dataCarla);
+            } 
+            else {
+                alert('Prueba ingresando los números: 966310655 o 925485908');
+                panel.style.display = 'none';
+            }
+        });
+
+        document.getElementById('btnLimpiar').addEventListener('click', function() {
+            document.getElementById('panelResultados').style.display = 'none';
+            document.getElementById('inputLinea').value = '';
+            document.getElementById('inputNroDoc').value = '';
+            document.getElementById('inputCuenta').value = '';
+            document.getElementById('inputContrato').value = '';
+            document.getElementById('inputTipoDoc').selectedIndex = 0;
+        });
+
+    </script>
+</body>
+</html>
